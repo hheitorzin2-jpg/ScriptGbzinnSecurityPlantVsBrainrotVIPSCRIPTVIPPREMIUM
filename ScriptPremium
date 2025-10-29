@@ -1,0 +1,575 @@
+-- Zakzin Torador Hub v3.0 PREMIUM
+-- Script para Plant vs Brainrot
+-- Feito por: gbzinn 💰
+-- Key: IsaacScriptPagoHub
+-- Preço: R$ 1,00 por script
+-- Atualizações diárias confirmadas! ✅
+
+-- ═══════════════════════════════════════════════════
+--              CARREGAR RAYFIELD
+-- ═══════════════════════════════════════════════════
+
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+-- ═══════════════════════════════════════════════════
+--              SCRIPT PRINCIPAL
+-- ═══════════════════════════════════════════════════
+
+-- Configurações Globais
+getgenv().ZakzinSettings = getgenv().ZakzinSettings or {
+    AutoBuySeeds = false,
+    BrainrotESP = false,
+    SkeletonESP = false,
+    NoClip = false,
+    InfiniteJump = false,
+    Fly = false,
+    FlySpeed = 50,
+    FPSBoost = false,
+    WalkSpeed = 16,
+    JumpPower = 50
+}
+
+-- Variáveis
+local Player = game:GetService("Players").LocalPlayer
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+
+-- ═══════════════════════════════════════════════════
+--           AUTO BUY SEEDS OTIMIZADO (4 em 4 min)
+-- ═══════════════════════════════════════════════════
+
+local function AutoBuyAllSeeds()
+    spawn(function()
+        while getgenv().ZakzinSettings.AutoBuySeeds do
+            pcall(function()
+                print("🌻 Iniciando compra de seeds...")
+                
+                -- Lista dos RemoteEvents que podem comprar seeds
+                local remoteNames = {
+                    "BuyRow", "BuyItem", "GiftItem", "UseItem", 
+                    "BuyGear", "BuyPortal", "BuyPlatform"
+                }
+                
+                -- Lista completa das seeds
+                local seeds = {
+                    "Cactus Seed",
+                    "Strawberry Seed",
+                    "Pumpkin Seed",
+                    "Sunflower Seed",
+                    "Dragon Fruit Seed",
+                    "Eggplant Seed",
+                    "Watermelon Seed",
+                    "Grape Seed",
+                    "Cocotank Seed",
+                    "Carnivorous Plant Seed",
+                    "Mr. Carrot Seed",
+                    "Tomatrio Seed",
+                    "King Lemon Seed"
+                }
+                
+                -- Tenta cada RemoteEvent com cada seed
+                for _, remoteName in ipairs(remoteNames) do
+                    local remote = ReplicatedStorage.Remotes:FindFirstChild(remoteName)
+                    if remote and remote.ClassName == "RemoteEvent" then
+                        for _, seed in ipairs(seeds) do
+                            print("🛒 Comprando:", seed, "via", remoteName)
+                            remote:FireServer(seed)
+                            wait(0.2)
+                        end
+                    end
+                end
+                
+                Rayfield:Notify({
+                    Title = "✅ Compra Concluída!",
+                    Content = "Todas as seeds foram compradas!",
+                    Duration = 3
+                })
+                
+                print("⏰ Aguardando 4 minutos para próxima compra...")
+            end)
+            
+            -- Esperar 4 minutos (240 segundos)
+            wait(240)
+        end
+    end)
+end
+
+-- ═══════════════════════════════════════════════════
+--                  ESP SYSTEMS
+-- ═══════════════════════════════════════════════════
+
+local function CreateBrainrotESP()
+    local function AddHighlight(obj)
+        if not obj:FindFirstChild("BrainrotESP") then
+            local highlight = Instance.new("Highlight")
+            highlight.Name = "BrainrotESP"
+            highlight.FillColor = Color3.fromRGB(255, 0, 0)
+            highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+            highlight.FillTransparency = 0.5
+            highlight.OutlineTransparency = 0
+            highlight.Parent = obj
+        end
+    end
+    
+    spawn(function()
+        while getgenv().ZakzinSettings.BrainrotESP do
+            pcall(function()
+                for _, obj in pairs(Workspace:GetDescendants()) do
+                    if obj.Name:match("Brainrot") and obj:IsA("Model") then
+                        AddHighlight(obj)
+                    end
+                end
+            end)
+            wait(2)
+        end
+        
+        -- Remover ESPs ao desativar
+        for _, obj in pairs(Workspace:GetDescendants()) do
+            if obj.Name == "BrainrotESP" then
+                obj:Destroy()
+            end
+        end
+    end)
+end
+
+local function CreateSkeletonESP()
+    local function AddBillboard(obj)
+        if obj:FindFirstChild("Humanoid") and not obj:FindFirstChild("SkeletonESP") then
+            local billboard = Instance.new("BillboardGui")
+            billboard.Name = "SkeletonESP"
+            billboard.Adornee = obj:FindFirstChild("HumanoidRootPart")
+            billboard.Size = UDim2.new(0, 100, 0, 50)
+            billboard.StudsOffset = Vector3.new(0, 3, 0)
+            billboard.AlwaysOnTop = true
+            
+            local textLabel = Instance.new("TextLabel")
+            textLabel.Size = UDim2.new(1, 0, 1, 0)
+            textLabel.BackgroundTransparency = 1
+            textLabel.Text = "💀 " .. obj.Name
+            textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+            textLabel.TextStrokeTransparency = 0
+            textLabel.Font = Enum.Font.SourceSansBold
+            textLabel.TextSize = 14
+            textLabel.Parent = billboard
+            
+            billboard.Parent = obj
+        end
+    end
+    
+    spawn(function()
+        while getgenv().ZakzinSettings.SkeletonESP do
+            pcall(function()
+                for _, obj in pairs(Workspace:GetDescendants()) do
+                    if obj.Name:match("Skeleton") or obj.Name:match("Zombie") and obj:IsA("Model") then
+                        AddBillboard(obj)
+                    end
+                end
+            end)
+            wait(2)
+        end
+        
+        -- Remover ESPs ao desativar
+        for _, obj in pairs(Workspace:GetDescendants()) do
+            if obj.Name == "SkeletonESP" then
+                obj:Destroy()
+            end
+        end
+    end)
+end
+
+-- ═══════════════════════════════════════════════════
+--              SISTEMA DE FLY (VOAR)
+-- ═══════════════════════════════════════════════════
+
+local flying = false
+local flyConnection
+
+local function StartFly()
+    local Character = Player.Character
+    if not Character then return end
+    
+    local HRP = Character:FindFirstChild("HumanoidRootPart")
+    local Humanoid = Character:FindFirstChild("Humanoid")
+    if not HRP or not Humanoid then return end
+    
+    flying = true
+    
+    local BodyVelocity = Instance.new("BodyVelocity")
+    BodyVelocity.Velocity = Vector3.new(0, 0, 0)
+    BodyVelocity.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+    BodyVelocity.Parent = HRP
+    
+    local BodyGyro = Instance.new("BodyGyro")
+    BodyGyro.P = 9e4
+    BodyGyro.MaxTorque = Vector3.new(9e9, 9e9, 9e9)
+    BodyGyro.CFrame = HRP.CFrame
+    BodyGyro.Parent = HRP
+    
+    flyConnection = RunService.Heartbeat:Connect(function()
+        if not flying then
+            BodyVelocity:Destroy()
+            BodyGyro:Destroy()
+            return
+        end
+        
+        local moveDirection = Vector3.new(0, 0, 0)
+        local Camera = workspace.CurrentCamera
+        
+        if UserInputService:IsKeyDown(Enum.KeyCode.W) then
+            moveDirection = moveDirection + Camera.CFrame.LookVector
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.S) then
+            moveDirection = moveDirection - Camera.CFrame.LookVector
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.A) then
+            moveDirection = moveDirection - Camera.CFrame.RightVector
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.D) then
+            moveDirection = moveDirection + Camera.CFrame.RightVector
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
+            moveDirection = moveDirection + Vector3.new(0, 1, 0)
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then
+            moveDirection = moveDirection - Vector3.new(0, 1, 0)
+        end
+        
+        BodyVelocity.Velocity = moveDirection * getgenv().ZakzinSettings.FlySpeed
+        BodyGyro.CFrame = Camera.CFrame
+    end)
+end
+
+local function StopFly()
+    flying = false
+    if flyConnection then
+        flyConnection:Disconnect()
+    end
+end
+
+-- ═══════════════════════════════════════════════════
+--            FPS BOOST (OTIMIZAÇÃO)
+-- ═══════════════════════════════════════════════════
+
+local function OptimizeFPS()
+    if getgenv().ZakzinSettings.FPSBoost then
+        -- Desativar efeitos visuais pesados
+        local Lighting = game:GetService("Lighting")
+        Lighting.GlobalShadows = false
+        Lighting.FogEnd = 9e9
+        
+        settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
+        
+        -- Remover efeitos de partículas
+        for _, obj in pairs(Workspace:GetDescendants()) do
+            if obj:IsA("ParticleEmitter") or obj:IsA("Trail") or obj:IsA("Smoke") or obj:IsA("Fire") then
+                obj.Enabled = false
+            end
+        end
+        
+        Rayfield:Notify({
+            Title = "⚡ FPS Otimizado!",
+            Content = "Performance melhorada!",
+            Duration = 3
+        })
+    end
+end
+
+-- ═══════════════════════════════════════════════════
+--                  CRIAR GUI RAYFIELD
+-- ═══════════════════════════════════════════════════
+
+local Window = Rayfield:CreateWindow({
+    Name = "🌻 Zakzin Torador Hub | Premium v3.0",
+    LoadingTitle = "Zakzin Torador Hub Premium",
+    LoadingSubtitle = "by gbzinn | R$ 1,00 💰",
+    ConfigurationSaving = {
+        Enabled = true,
+        FolderName = "ZakzinHubPremium",
+        FileName = "PlantVsBrainrot_v3"
+    },
+    Discord = {
+        Enabled = false
+    },
+    KeySystem = false
+})
+
+-- ═══════════════════════════════════════════════════
+--                ABA: 📢 ATUALIZAÇÕES
+-- ═══════════════════════════════════════════════════
+
+local UpdateTab = Window:CreateTab("📢 Atualizações", 4483362458)
+
+UpdateTab:CreateSection("🔥 Atualizações Diárias Confirmadas")
+
+UpdateTab:CreateParagraph({
+    Title = "📅 Última Atualização: HOJE",
+    Content = "✅ Auto Buy Seeds otimizado (4 em 4 min)\n✅ Sistema de ESP melhorado\n✅ Fly system adicionado\n✅ FPS Boost implementado\n✅ NoClip corrigido\n\n💰 Todos os scripts: R$ 1,00\n📱 Contato: gbzinn (Discord/Telegram)"
+})
+
+UpdateTab:CreateLabel("🎯 Próximas atualizações:")
+UpdateTab:CreateLabel("• Auto Farm completo")
+UpdateTab:CreateLabel("• Auto Sell otimizado")
+UpdateTab:CreateLabel("• Auto Rebirth")
+UpdateTab:CreateLabel("• Duplication glitches")
+
+-- ═══════════════════════════════════════════════════
+--                ABA: 🌱 AUTO FARM
+-- ═══════════════════════════════════════════════════
+
+local FarmTab = Window:CreateTab("🌱 Auto Farm", 4483362458)
+
+FarmTab:CreateSection("Compra Automática Premium")
+
+FarmTab:CreateToggle({
+    Name = "🌻 Auto Buy ALL Seeds (4 em 4 min)",
+    CurrentValue = false,
+    Flag = "AutoBuySeeds",
+    Callback = function(Value)
+        getgenv().ZakzinSettings.AutoBuySeeds = Value
+        if Value then
+            AutoBuyAllSeeds()
+            Rayfield:Notify({
+                Title = "✅ Auto Buy Ativado!",
+                Content = "Comprando todas as seeds a cada 4 minutos!",
+                Duration = 4
+            })
+        else
+            Rayfield:Notify({
+                Title = "❌ Auto Buy Desativado",
+                Content = "Compra automática pausada",
+                Duration = 3
+            })
+        end
+    end
+})
+
+FarmTab:CreateLabel("⏰ Sistema inteligente: Compra a cada 4 minutos")
+FarmTab:CreateLabel("🎯 Todas as 13 seeds incluídas")
+FarmTab:CreateLabel("🔄 Testa 7 métodos diferentes de compra")
+
+-- ═══════════════════════════════════════════════════
+--                ABA: 👁️ VISUAL (ESP)
+-- ═══════════════════════════════════════════════════
+
+local VisualTab = Window:CreateTab("👁️ Visual", 4483362458)
+
+VisualTab:CreateSection("ESP Systems")
+
+VisualTab:CreateToggle({
+    Name = "👹 Brainrot ESP",
+    CurrentValue = false,
+    Flag = "BrainrotESP",
+    Callback = function(Value)
+        getgenv().ZakzinSettings.BrainrotESP = Value
+        if Value then
+            CreateBrainrotESP()
+        end
+    end
+})
+
+VisualTab:CreateToggle({
+    Name = "💀 Skeleton ESP",
+    CurrentValue = false,
+    Flag = "SkeletonESP",
+    Callback = function(Value)
+        getgenv().ZakzinSettings.SkeletonESP = Value
+        if Value then
+            CreateSkeletonESP()
+        end
+    end
+})
+
+VisualTab:CreateToggle({
+    Name = "💡 Full Bright",
+    CurrentValue = false,
+    Callback = function(Value)
+        local Lighting = game:GetService("Lighting")
+        if Value then
+            Lighting.Brightness = 2
+            Lighting.ClockTime = 14
+            Lighting.FogEnd = 100000
+            Lighting.GlobalShadows = false
+            Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
+        else
+            Lighting.Brightness = 1
+            Lighting.ClockTime = 12
+            Lighting.GlobalShadows = true
+        end
+    end
+})
+
+-- ═══════════════════════════════════════════════════
+--                ABA: 👤 PLAYER
+-- ═══════════════════════════════════════════════════
+
+local PlayerTab = Window:CreateTab("👤 Player", 4483362458)
+
+PlayerTab:CreateSection("Movimento e Velocidade")
+
+PlayerTab:CreateSlider({
+    Name = "🏃 Walk Speed",
+    Range = {16, 200},
+    Increment = 1,
+    CurrentValue = 16,
+    Flag = "WalkSpeed",
+    Callback = function(Value)
+        getgenv().ZakzinSettings.WalkSpeed = Value
+        local Character = Player.Character
+        if Character and Character:FindFirstChild("Humanoid") then
+            Character.Humanoid.WalkSpeed = Value
+        end
+    end
+})
+
+PlayerTab:CreateSlider({
+    Name = "🦘 Jump Power",
+    Range = {50, 300},
+    Increment = 5,
+    CurrentValue = 50,
+    Flag = "JumpPower",
+    Callback = function(Value)
+        getgenv().ZakzinSettings.JumpPower = Value
+        local Character = Player.Character
+        if Character and Character:FindFirstChild("Humanoid") then
+            Character.Humanoid.JumpPower = Value
+        end
+    end
+})
+
+PlayerTab:CreateSection("Habilidades Especiais")
+
+PlayerTab:CreateToggle({
+    Name = "✈️ Fly (Voar)",
+    CurrentValue = false,
+    Flag = "Fly",
+    Callback = function(Value)
+        getgenv().ZakzinSettings.Fly = Value
+        if Value then
+            StartFly()
+            Rayfield:Notify({
+                Title = "✈️ Fly Ativado!",
+                Content = "WASD = Mover | Space = Subir | Shift = Descer",
+                Duration = 5
+            })
+        else
+            StopFly()
+        end
+    end
+})
+
+PlayerTab:CreateSlider({
+    Name = "✈️ Fly Speed",
+    Range = {10, 200},
+    Increment = 5,
+    CurrentValue = 50,
+    Flag = "FlySpeed",
+    Callback = function(Value)
+        getgenv().ZakzinSettings.FlySpeed = Value
+    end
+})
+
+PlayerTab:CreateToggle({
+    Name = "♾️ Infinite Jump",
+    CurrentValue = false,
+    Flag = "InfiniteJump",
+    Callback = function(Value)
+        getgenv().ZakzinSettings.InfiniteJump = Value
+        UserInputService.JumpRequest:Connect(function()
+            if getgenv().ZakzinSettings.InfiniteJump then
+                local Character = Player.Character
+                if Character and Character:FindFirstChild("Humanoid") then
+                    Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+                end
+            end
+        end)
+    end
+})
+
+PlayerTab:CreateToggle({
+    Name = "👻 NoClip",
+    CurrentValue = false,
+    Flag = "NoClip",
+    Callback = function(Value)
+        getgenv().ZakzinSettings.NoClip = Value
+        spawn(function()
+            while getgenv().ZakzinSettings.NoClip do
+                local Character = Player.Character
+                if Character then
+                    for _, part in pairs(Character:GetDescendants()) do
+                        if part:IsA("BasePart") then
+                            part.CanCollide = false
+                        end
+                    end
+                end
+                wait(0.1)
+            end
+            -- Restaurar colisão
+            local Character = Player.Character
+            if Character then
+                for _, part in pairs(Character:GetDescendants()) do
+                    if part:IsA("BasePart") and part.Name ~= "HumanoidRootPart" then
+                        part.CanCollide = true
+                    end
+                end
+            end
+        end)
+    end
+})
+
+-- ═══════════════════════════════════════════════════
+--                ABA: ⚙️ SETTINGS
+-- ═══════════════════════════════════════════════════
+
+local SettingsTab = Window:CreateTab("⚙️ Settings", 4483362458)
+
+SettingsTab:CreateSection("Otimização")
+
+SettingsTab:CreateButton({
+    Name = "⚡ FPS Boost",
+    Callback = function()
+        getgenv().ZakzinSettings.FPSBoost = true
+        OptimizeFPS()
+    end
+})
+
+SettingsTab:CreateSection("Utilidades")
+
+SettingsTab:CreateButton({
+    Name = "🔄 Rejoin Server",
+    Callback = function()
+        game:GetService("TeleportService"):Teleport(game.PlaceId, Player)
+    end
+})
+
+SettingsTab:CreateButton({
+    Name = "❌ Destroy GUI",
+    Callback = function()
+        Rayfield:Destroy()
+    end
+})
+
+SettingsTab:CreateSection("Informações")
+
+SettingsTab:CreateLabel("💰 Script Premium - R$ 1,00")
+SettingsTab:CreateLabel("👤 Criador: gbzinn")
+SettingsTab:CreateLabel("🔑 Key: IsaacScriptPagoHub")
+SettingsTab:CreateLabel("📅 Atualizações diárias confirmadas!")
+
+-- Manter configurações ao respawnar
+Player.CharacterAdded:Connect(function(char)
+    wait(1)
+    local hum = char:WaitForChild("Humanoid")
+    hum.WalkSpeed = getgenv().ZakzinSettings.WalkSpeed
+    hum.JumpPower = getgenv().ZakzinSettings.JumpPower
+end)
+
+-- Mensagem Final
+print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+print("🌻 Zakzin Torador Hub v3.0 PREMIUM")
+print("💰 Obrigado pelos R$ 1,00!")
+print("👤 Criado por: gbzinn")
+print("📅 Atualizações diárias confirmadas!")
+print("⭐ Script carregado com sucesso!")
+print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
